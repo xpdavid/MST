@@ -1,0 +1,193 @@
+<!DOCTYPE html> 
+<html lang="en">
+  <head>
+    <meta charset=utf-8>
+    <title>Minimal Spanning Tree</title>
+    <!--Jquery support-->
+    <script src = "js/jquery-2.1.4.min.js"></script>
+    <!--Bootstrap grid support-->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src = "js/bootstrap.js"></script>
+    <!--self support-->
+    <link href="css/index.css" rel="stylesheet">
+    <script src = "js/index.js"></script>
+    <!--JQuery UI drag support-->
+    <script src = "js/jquery-ui-1.11.4/jquery-ui.js"></script>
+    <link href="js/jquery-ui-1.11.4/jquery-ui.min.css" rel="stylesheet">
+</head>
+<body>
+<script type="text/javascript">
+  $(document).ready(function(){
+    $(document).bind("contextmenu",function(e){
+          return false;
+    });
+    
+    $("#drag_area").mouseup(function(e) {
+      if (mouse_event_node1 !== undefined && mouse_event_node2 === undefined && e.which === 3) {
+        mouse_event_node1.de_highlight();
+        mouse_edge.node1.stop_line_to_mouse();
+      }
+    });
+  
+    $("#get_weight_modal").draggable({
+      handle: ".modal-header"
+    });
+
+    $("#k_method").draggable({
+      handle: ".modal-header"
+    });
+
+  });
+
+  var all_nodes = {count:0};
+  var all_edges = {count:0};
+  var initial_x = 20;
+  var initial_y = 20;
+  var initial_alpa = 1;
+  var initial_edge = 1;
+  var initial_z_index = 1;
+  
+  var mouse_event_node1 = undefined;
+  var mouse_event_node2 = undefined;
+  var mouse_event_weight = "";
+  var mouse_edge = undefined;
+
+
+</script>
+
+<div class="modal fade" id="k_method">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Kruskal method</h4>
+      </div>
+      <div class="modal-body">
+        <h4>First order the edges array</h4>
+        <table class="table" id = "ordered_edges">
+          <thead>
+            <tr>
+              <th width="30%">#</th>
+              <th width="40%">Connect<th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="k_method_main();">Begin the algorithm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="get_weight_modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                 <h4 class="modal-title">Add Edges Settings</h4>
+            </div>
+            <div class="modal-body">
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <div class="input-group">
+                        <div class="input-group-addon">The weight of the Edge</div>
+                        <input type="text" class="form-control" id="edge_weight" placeholder="Weight">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            	</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="deny_create_edge();">Close</button>
+                <button type="button" class="btn btn-primary" onclick="create_egde();">Create</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<br>
+<div class="container-fluid">
+	<div class="col-md-1">
+		<img src="img/logo.jpg" class="img-responsive" alt="Responsive image" width = "100px">
+	</div>
+	<div class="col-md-5">
+		<h1 class="header">Minimal Spanning Tree</h1>
+	</div>
+	<div class="col-md-6">
+		<blockquote class="blockquote-reverse">
+			 <p>A minimum spanning tree is a spanning tree of a connected, undirected graph. It connects all the vertices together with the minimal total weighting for its edges.</p>
+  			<footer>From <cite title="Source Title">Wikipedia</cite>, the free encyclopedia</footer>
+		</blockquote>
+	</div>
+</div>
+<div class="container-fluid">
+	<div class="col-md-12"><h3>Let's get start! <span class="label label-default">Vesrion 1.0.0 Beta</span>&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-primary" onclick="p_method();">Prim method to find MST</button>&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-success" onclick="k_method_pre();">Kruskal method to find MST</button></h3></div>
+</div>
+<br />
+<div class="container-fluid">
+  	<div class="col-md-9">
+  		<div class="well" id = "drag_area">
+        <div id = "lines">
+          <div id = "mouse_edge"></div>
+        </div>
+        <div id = "weights"></div>
+
+  		</div>
+  	</div>
+  	<div class="col-md-3">
+  		<div class="panel panel-primary">
+  			<div class="panel-heading">Control Panel</div>
+  			<div class="panel-body">
+  				<button type="button" class="btn btn-success" onclick="add_node();">Add Nodes</button>				
+  				<div id="nodes">
+				    <h3>Nodes</h3>
+					<table class="table table-hover table-condensed">
+						<thead>
+							<tr>
+								<th width="30%">#</th>
+								<th width="40%">Name<th>
+								<th width="30%">Operation<th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+  				</div>
+
+  				<div id="edges">
+				    <h3>Edges</h3>
+					<table class="table table-hover table-condensed">
+						<thead>
+							<tr>
+								<th width="30%">#</th>
+								<th width="40%">Connect<th>
+								<th width="30%">Operation<th>
+							</tr>
+						</thead>
+						<tbody>
+
+						</tbody>
+					</table>
+  				</div>
+  			</div>
+		</div>
+  	</div>
+</div>
+
+
+
+</body>
+</html>
